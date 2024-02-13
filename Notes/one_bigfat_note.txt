@@ -1,0 +1,35 @@
+13/02
+- Diving into RL Basics:
+    > RL Official definition: Solving control / decision making tasks by building agents that interact and learnt from environment by getting rewards
+    > RL FrameWork: State, Action, Reward, Next State. (even not being dead is a reward!!!)
+    > RL goal is to maximize the "Expected Return", or in other words Cumulative Reward
+    > Markov Property: States that Agent needs only the current state to take act/ take decision, not the entire history of states
+    > Observed State is partial description of the environment(2dScroller), State is "complete" description of the environment(game board). 
+    > Action Space: Set of possible action that can be taken by Agent. Continuous(selfDriving Car) or Discrete(Mario game, 4 directions)
+    > Reward and discounting is the only feedback to the agent in RL. More predictable near term rewards, Vs unpredictable longterm reward. 
+        <> Discounting happens depending on whether we are likely to get the reward, (as it is dangerous)
+        <> Or the reward will be available in the future
+        🎇 Measured using Gamma: Between 0 and 1 usually 0.95 to 0.99.  
+        🥌 leads to discouted expected cumulative reward = Sum[gamma^k*reward_k + k + 1]
+
+    > Types of tasks: Episodic / Continuous
+        <> Episode : List of States, Actions, Rewards and New states. Has start and end.
+        <> Continuous: Agent has to choose best action by interacting with the environment, continuously
+
+    > Exploring / Exploiting tradeoff:
+        <> Exploiting is using up the near resources 
+        <> Exploring is learning about the environment by doing random things, and 
+        getting bigger rewards
+
+    > How to solve RL?
+        <> By using policy: Policy is the brain / function that needs to be learnt to maximize the expected return, 
+        when agent does according to it.
+        🌱 policy based: Teaching agent to take the next action 
+            💢 policy is a function, that keeps mapping of state and the best possible action that one can take. 
+                🌀 Deterministic policy : given a state, return same action
+                🌀 Stochastic policy : given a state , returns value from prob distribution of actions
+        🌱 value based : showing agent which state is more valuable
+            💢 value function maps the state with the value of being at that state
+            💢 policy in this case will be to go to a state with higher value
+             Policy will select the state with maximum returns
+    https://huggingface.co/learn/deep-rl-course/unit1/deep-rl
