@@ -7,10 +7,10 @@
     > Observed State is partial description of the environment(2dScroller), State is "complete" description of the environment(game board). 
     > Action Space: Set of possible action that can be taken by Agent. Continuous(selfDriving Car) or Discrete(Mario game, 4 directions)
     > Reward and discounting is the only feedback to the agent in RL. More predictable near term rewards, Vs unpredictable longterm reward. 
-        <> Discounting happens depending on whether we are likely to get the reward, (as it is dangerous)
+        <> Discounting happens depending on whether we are likely to get the reward, (as it could be dangerous or unavailable)
         <> Or the reward will be available in the future
         🎇 Measured using Gamma: Between 0 and 1 usually 0.95 to 0.99.  
-        🥌 leads to discouted expected cumulative reward = Sum[gamma^k*reward_k + k + 1]
+        🥌 leads to discounted expected cumulative reward = Sum[gamma^k*reward_k + k + 1]
 
     > Types of tasks: Episodic / Continuous
         <> Episode : List of States, Actions, Rewards and New states. Has start and end.
@@ -21,7 +21,7 @@
         <> Exploring is learning about the environment by doing random things, and 
         getting bigger rewards
 
-    > How to solve RL?
+    > How to solve RL? Solution is a Optimal Policy
         <> By using policy: Policy is the brain / function that needs to be learnt to maximize the expected return, 
         when agent does according to it.
         🌱 policy based: Teaching agent to take the next action 
@@ -33,3 +33,39 @@
             💢 policy in this case will be to go to a state with higher value
              Policy will select the state with maximum returns
     https://huggingface.co/learn/deep-rl-course/unit1/deep-rl
+14/02
+    > How deep learning is involved?
+        <> Will use Deep Neural Networks to find the optimal policy
+    > Handson: Lunar Lander on JupyterNotebook (projects\LunarLander\unit1.ipynb)
+        <> Learnt that huggingface_sb3 library for loading and uploading models
+        <> Libraries involved in creating videos from the captured frames are thought.
+        <> leart about os.kill(os.getpid(), 9) to bring down the runtime
+        🤔 The notebook was 1st executed directly on colab, so not typing out the 
+        commands.(The notebook was introductory, there will be many occasions to train later) 
+        <> Will be using the gymnasium maintained by (https://farama.org/projects), where 
+        many other like PettingZoo, Minari, Comet, CleanRL and a lot more
+        <> Bonus update is on the Unity front, there is https://github.com/Unity-Technologies/ml-agents
+        and 
+        <> Once the LunarLander environment is understood, then the model needs to be 
+        created, using StableBaselines3
+        <> PPO is a combination of:
+        Value-based reinforcement learning method: learning an action-value function that will tell us the 
+        most valuable action to take given a state and action.
+        Policy-based reinforcement learning method: learning a policy that will give us a 
+        probability distribution over actions.
+    🙌 Completed unit1 and bonus unit, will be entering into 
+    https://huggingface.co/learn/deep-rl-course/unit2/introduction
+    > Setup the environment for RLWork in Kali:
+        Bash level:
+            - !apt install swig cmake
+            - !sudo apt-get update
+            - !sudo apt-get install -y python3-opengl
+            - !apt install ffmpeg
+            - !apt install xvfb
+        Pip Level:
+            - pyvirtualdisplay(https://github.com/ponty/pyvirtualdisplay/tree/3.0)
+            - stable-baselines3==2.0.0a5
+            - swig
+            - gymnasium[all] (think if entire gym is better to install)
+            - huggingface_sb3
+
