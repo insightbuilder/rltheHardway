@@ -69,3 +69,46 @@
             - gymnasium[all] (think if entire gym is better to install)
             - huggingface_sb3
 
+    > DeepQLearning : Value Based methods
+        - value function maps state to the expected value of being at the state. 
+        - policy is not trained, we need to train the value function(neural net). this value function 
+        outputs the value of the state or state-action pair. 
+        - depending on the value, the policy will take action. 
+        - **we have to design a policy** for the value to take the action
+        so finding the optimal value function leads to optimal policy. 
+        - Epsilon-Greedy policy is used
+        - Two Value functions: 
+            > State - Value function : Returns expected returns if agent starts at that state, and 
+            follows the policy for all future timesteps.
+            > Action - Value Function: for each state / action pair the action-value func returns the 
+            expected return in that state, if agents starts at that state, takes that action and 
+            follows policy for all future timesteps
+        - Bellman equation simplifies value estimation for both state-value or action-value function 
+         the sum of immediate reward + the discounted value of the state that follows.
+         Bellman Eqn: Rt+1 + gamma * V(St+1)
+         This is similar to dynamic programming, recursive solution
+         - Learning Stategies : Monte-Carlo vs Temporal difference learning. 
+         MC uses entire episode of experience before learning, while temporal difference uses 
+         only the time-steps to learn.
+            (*) With Monte Carlo, we update the value function from a complete episode,
+            and so we use the actual accurate discounted return of this episode.
+
+            (*) With TD Learning, we update the value function from a step, and we replace Gt,
+            which we don’t know, with an estimated return called the TD target.
+        - Q-Learning is the algorithm we use to train our Q-function, an action-value function that 
+        determines the value of being at a particular state and taking a specific action at that state
+        The Q comes from “the Quality” (the value) of that action at that state.
+        - a Q-table that has the value of each state-action pair. Given a state and action, 
+        our Q-function will search inside its Q-table to output the value.
+        - When the training is done, we have an optimal Q-function, which means we have optimal Q-table.
+        💡 Epsilon - Greedy Idea:
+        The idea is that, with an initial value of ɛ = 1.0:
+            With probability 1 — ɛ : we do exploitation (aka our agent selects the action with the highest state-action pair value).
+            With probability ɛ: we do exploration (trying random action).
+        the probability of doing exploration will be huge since ɛ is very high, 
+        so most of the time, we’ll explore. But as the training goes on, and consequently our 
+        Q-table gets better and better in its estimations, we progressively reduce the epsilon value
+        💡 off-policy: using a different policy for acting (inference) and updating (training).
+        For instance, with Q-Learning, the epsilon-greedy policy (acting policy), is different from the 
+        greedy policy that is used to select the best next-state action value to update our Q-value (updating policy).
+        💡 on-policy: using a same policy for acting (inference) and updating (training).
