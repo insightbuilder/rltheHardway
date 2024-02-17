@@ -161,3 +161,140 @@
         💡 The frames are stacked to overcome the temporal limitations, like knowing the direction of the object movement in frames 
         🆔 Deep Q-Learning, we create a loss function that compares our Q-value prediction and
         the Q-target and uses gradient descent to update the weights of our Deep Q-Network to approximate our Q-values better. 
+16/02
+    - Windows Install: (not working due to challenge with the VCRedist)
+        > Gymnasium import threw FileNotFoundError: Could not find module 'msvcp140.dll'
+        The issue seems to be VC++ pack is not installed. Trying to re-install the pack by 
+        download the VCredist still did not work 
+    TD : Temporal Difference 
+    - continuing with https://huggingface.co/learn/deep-rl-course/unit3/deep-q-algorithm
+    🌛 The Deep Q-Learning training algorithm has two phases:
+        - Sampling: we perform actions and store the observed experience tuples in a replay memory.
+        - Training: Select a small batch of tuples randomly and learn from this batch using a gradient descent update step.    
+        To help us stabilize the training, we implement three different solutions:
+            -> Experience Replay to make more efficient use of experiences.
+            -> Fixed Q-Target to stabilize the training.
+            -> Double Deep Q-Learning, to handle the problem of the overestimation of Q-values.
+        - Experiences Replay:
+            -> gets experiences (state, action, reward, and next state) & updates NN 
+            -> reusing the experiences and sample them during training
+            -> avoid catastrophic forgetting, reduce correlation
+            -> avoid oscillating / diverging action values
+        - Fixed Q-Target:
+            -> When we want to calculate the TD error (aka the loss), we calculate the
+            difference between the TD target (Q-Target) and the current Q-value (estimation of Q).
+            ->  don’t have any idea of the real TD target. We need to estimate it. Using the Bellman 
+            equation, we saw that the TD target is just the reward of taking that action at that state 
+            plus the discounted highest Q value for the next state.
+            -> Use a separate network with fixed parameters for estimating the TD Target
+            -> Copy the parameters from our Deep Q-Network every C steps to update the target network.
+        - Double deep-q learning:
+            -> https://papers.nips.cc/paper_files/paper/2010/hash/091d584fced301b442654dd8c23b3fc9-Abstract.html
+        - handson uses CNN policy and trains on AtariSpace Invaders. There will 10M training steps, which 
+        requires atleast 5 hours. So need to run train on local GPU.
+        - Need to install rl_baselines_zoo and rl_agents (https://rl-baselines3-zoo.readthedocs.io/)
+        - https://youtube.com/playlist?list=PLwRJQ4m4UJjNymuBM9RdmB3Z9N5-0IlY0&si=mIPln3u6TAd7Ug5s
+        The above playlist provides the basic of RL.(Foundations of Deep RL -- 6-lecture series) 
+        - https://www.youtube.com/watch?v=sPEEV8Xih20&list=PLRqwX-V7Uu6YJ3XfHhT2Mm4Y5I99nrIKX
+        Shiffman has a interesting series on algorithm and learning. 
+    - Bonus unit-3: Automatic HyperParameter Tuning with Optuna
+        - Theory of searching HyperParameter Automatically:
+            https://youtu.be/AidFTOdGNFQ
+        - Optuna HandsON:
+            https://youtu.be/ihP7E76KGOI
+    - Unit 4: Policy Gradient with PyTorch
+        Some things new:
+        https://spinningup.openai.com/  
+         Objective: Implement policy gradient algorithm called Monte Carlo Reinforce from 
+         scratch using PyTorch
+         Steps of Policy Based RL:
+            -> parameterize the policy, using a neural net pi-0, where policy will output probability 
+            distribution over actions.
+            -> objective then is to maximize the performance of the parameterized policy using gradient ascent.
+            -> control parameter is theta to affect the distribution of actions over state.
+            There are two sub-classes in policy-based methods:
+            The difference between these two methods lies on how we optimize the parameter
+                * In policy-based methods, we search directly for the optimal policy. We can optimize the parameter θ 
+                indirectly by maximizing the local approximation of the objective function with techniques like hill 
+                climbing, simulated annealing, or evolution strategies.
+                * In policy-gradient methods, because it is a subclass of the policy-based methods, we search directly 
+                for the optimal policy. But we optimize the parameter θ directly by performing the gradient ascent on 
+                the performance of the objective function J(θ).
+                Benefits:
+                    Policy-gradient methods can learn a stochastic policy while value functions can’t.
+                    This has two consequences:
+                    -> We don’t need to implement an exploration/exploitation trade-off by hand. 
+                    Since we output a probability distribution over actions, the agent explores the state 
+                    space without always taking the same trajectory.
+                    -> We also get rid of the problem of perceptual aliasing. Perceptual aliasing is 
+                    when two states seem (or are) the same but need different actions. 
+                    -> Policy-gradient methods are more effective in high-dimensional action 
+                    spaces and continuous actions spaces
+                    -> policy-gradient methods, we output a probability distribution over actions.
+                    -> Policy-gradient methods have better convergence properties
+                Cons:
+                    - Frequently, policy-gradient methods converges to a local maximum instead of a 
+                    global optimum.
+                    - Policy-gradient goes slower, step by step: it can take longer to train (inefficient).
+                    - Policy-gradient can have high variance. We’ll see in the actor-critic unit why,
+                    and how we can solve this problem.
+            Diving into Policy Gradient Method:
+            -> The idea is that we have a parameterized stochastic policy. In our case, a neural network outputs
+            a probability distribution over actions. The probability of taking each action is also called the 
+            action preference.
+            -> Policy-gradient is to control the probability distribution of actions by tuning the policy 
+            such that good actions (that maximize the return) are sampled more frequently in the future
+            -> The idea is that we’re going to let the agent interact during an episode. And if we win the 
+            episode, we consider that each action taken was good and must be more sampled in the future since 
+            they lead to win.So for each state-action pair, we want to increase the P(a∣s): the probability of 
+            taking that action at that state. Or decrease if we lost.
+            -> The objective function gives us the performance of the agent given a trajectory (state action sequence 
+            without considering reward (contrary to an episode)), and it outputs the expected cumulative reward.
+            ->  gradient-ascent. It’s the inverse of gradient-descent since it gives the direction of the
+            steepest increase of J(θ).
+            2 Problems:
+            -> Calculating true gradient can be super expensive, since calculating each trajectory will be computationally 
+            expensive.  So we want to calculate a gradient estimation with a sample-based estimate (collect some trajectories).
+            -> o differentiate this objective function, we need to differentiate the state distribution, called the Markov Decision 
+            Process dynamics. This is attached to the environment. It gives us the probability of the environment going into 
+            the next state, given the current state and the action taken by the agent. 
+            -> we’re going to use a solution called the Policy Gradient Theorem that will help us to reformulate the 
+            objective function into a differentiable function that does not involve the differentiation of the state distribution.
+            -> The Reinforce algorithm, also called Monte-Carlo policy-gradient, is a policy-gradient algorithm that uses an 
+            estimated return from an entire episode to update the policy parameter θ:
+    - unit-4: Intro to ML Agents
+        - Unity ML-Agents is a toolkit for the game engine Unity that allows us to create environments using Unity or use 
+        pre-made environments to train our agents.
+        - 6 components:
+            -> The first is the Learning Environment, which contains the Unity scene (the environment) and the environment elements (game characters).
+                - The first is the agent component, the actor of the scene. We’ll train the agent by optimizing its policy (which will tell us what action to take in each state).
+                    The policy is called the Brain.
+                - Finally, there is the Academy. This component orchestrates agents and their decision-making processes. Think of this Academy as a teacher who handles Python API requests    
+                The Academy will be the one that will send the order to our Agents and ensure that agents are in sync:
+                    - Collect Observations
+                    - Select your action using your policy
+                    - Take the Action
+                    - Reset if you reached the max step or if you’re done.
+            -> The second is the Python Low-level API, which contains the low-level Python interface for interacting and manipulating the environment. It’s the API we use to launch the training.
+            -> Then, we have the External Communicator that connects the Learning Environment (made with C#) with the low level Python API (Python).
+            -> The Python trainers: the Reinforcement algorithms made with PyTorch (PPO, SAC…).
+            -> The Gym wrapper: to encapsulate the RL environment in a gym wrapper.
+            -> The PettingZoo wrapper: PettingZoo is the multi-agents version of the gym wrapper.
+        - snowball and pyramid environment is explained in detail:
+            -> you need to avoid the reward engineering problem, which is having a too complex reward function to force your agent to behave as you want it to do. Why? Because by doing that,
+            you might miss interesting strategies that the agent will find with a simpler reward function.
+            Why Curiosity?:
+            -> introducing the curiosity driven next state predictions. (https://medium.com/data-from-the-trenches/curiosity-driven-learning-through-next-state-prediction-f7f4e2f592fa) 
+            -> Random Network Distillation (https://medium.com/data-from-the-trenches/curiosity-driven-learning-through-random-network-distillation-488ffd8e5938)
+            -> 2 problems with RL:
+                - First, the sparse rewards problem: that is, most rewards do not contain information, and hence are set to zero.
+                - second big problem is that the extrinsic reward function is handmade; in each environment, a human has to implement 
+                a reward function. But how we can scale that in big and complex environments?
+            -> So Curiosity is : This intrinsic reward mechanism is known as Curiosity because this reward pushes the agent to explore states that are novel/unfamiliar.
+            To achieve that, our agent will receive a high reward when exploring new trajectories. 
+            -> Calculate Curiosity as the error of our agent in predicting the 
+            next state, given the current state and action taken.
+            -> Curiosity is to encourage our agent to perform actions that reduce the uncertainty in the agent’s ability to predict the consequences of its actions (uncertainty 
+            will be higher in areas where the agent has spent less time or in areas with complex dynamics). 
+            -> ML-Agents uses a more advanced one called Curiosity through random network distillation. This is out of the scope of the tutorial but if you’re interested 
+            
