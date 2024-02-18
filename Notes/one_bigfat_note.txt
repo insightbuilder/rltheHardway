@@ -262,7 +262,7 @@
             objective function into a differentiable function that does not involve the differentiation of the state distribution.
             -> The Reinforce algorithm, also called Monte-Carlo policy-gradient, is a policy-gradient algorithm that uses an 
             estimated return from an entire episode to update the policy parameter θ:
-    - unit-4: Intro to ML Agents
+    - unit-5: Intro to ML Agents
         - Unity ML-Agents is a toolkit for the game engine Unity that allows us to create environments using Unity or use 
         pre-made environments to train our agents.
         - 6 components:
@@ -297,4 +297,87 @@
             -> Curiosity is to encourage our agent to perform actions that reduce the uncertainty in the agent’s ability to predict the consequences of its actions (uncertainty 
             will be higher in areas where the agent has spent less time or in areas with complex dynamics). 
             -> ML-Agents uses a more advanced one called Curiosity through random network distillation. This is out of the scope of the tutorial but if you’re interested 
-            
+    - Unit-6: Actor Critic method
+        - Challenge of Variance in Reinforce.
+            -> In monte-carlo sampling, the trajectory is collected and discounted returns are calculated. If the returns are good, then all the actions are reinforced. Method 
+            has advantage of being un-biased.
+            -> Due to stochastic(random events in an episode) and stochasticity in policy the trajectories can lead to different returns, 
+            leading to high variance
+            -> High bias : Underfit / Just Right / High Variance: Over fit
+            https://blog.mlreview.com/making-sense-of-the-bias-variance-trade-off-in-deep-reinforcement-learning-79cf1e83d565
+
+        - Idea behind Actor Critic method:
+            > This is the idea behind Actor-Critic. We learn two function approximations:
+                - A policy function that controls how our agent acts. 
+                    * Takes the current state from the environment and pass it thru policy 
+                    * Policy outputs an Action
+                - A value function to assist the policy update by measuring how good the action taken is.
+                    * Value function takes state and action, and computes value and return Q-Value     
+            > Advantage function compares the relative advantage of action compared to the other 
+            possible at a state. How taking that action at a state is better compared to the average 
+            value of the state. 
+            > Fortunately, we can use the TD error as a good estimator of the advantage function.
+        - Dense Vs Sparse reward:
+            * We’re going to use the dense version of this environment. It means we’ll get a dense reward function that will provide a reward at each 
+            timestep (the closer the agent is to completing the task, the higher the reward). Contrary to a sparse reward function where 
+            the environment return a reward if and only if the task is completed.
+        - The model training is a straightforward using the A2C class that is part of the stablebaselines
+    - Unit-7: Introducing Multi-agent Environment (Multi-Agent Reinforce Learning)
+        - we learned to train agents in a single-agent system where our agent was alone in its environment: it was not cooperating or 
+        collaborating with other agents.
+        - Two types of Environment: Cooperative Vs Competitive or Adverserial Vs Mixed 
+        - How to Train multi-agents:
+            * Decentralized training: Agents are designed and trained individually without sharing info 
+            with other agents. The tech will make the environment non-stationary. The other agents will 
+            move, and considered as part of the environment.
+            * Centralized Training: High level process collect the agents experiences using exp-buffers 
+            and use it learn common-policy
+        - Self-Play :  In self-play, the agent uses former copies of itself (of its policy) as an opponent. This way, the agent 
+        will play against an agent of the same level (challenging but not too much), have opportunities to gradually improve its 
+        policy, and then update its opponent as it becomes better. It’s a way to bootstrap an opponent and 
+        progressively increase the opponent’s complexity.
+        https://blog.unity.com/engine-platform/training-intelligent-adversaries-using-self-play-with-ml-agents
+        - Some parameters to control:
+            * How often we change opponents with the swap_steps and team_change parameters.
+            * The number of opponents saved with the window parameter. A larger value of window  means that an agent’s pool of opponents will contain a larger diversity of behaviors since it will contain policies from earlier in the training run.
+            * The probability of playing against the current self vs opponent sampled from the pool with play_against_latest_model_ratio. A larger value of play_against_latest_model_ratio  indicates that an agent will be playing against the current opponent more often.
+            * The number of training steps before saving a new opponent with save_steps parameters.
+        - n ELO rating system (named after Arpad Elo) that calculates the relative skill level between 2 players from a given population in a zero-sum game.
+        - The winning player takes points from the losing one.
+            * The number of points is determined by the difference in the 2 players ratings (hence relative).
+            * If the higher-rated player wins → few points will be taken from the lower-rated player.
+            * If the lower-rated player wins → a lot of points will be taken from the high-rated player.
+            * If it’s a draw → the lower-rated player gains a few points from the higher.
+        - When multi-agents are involved, and they have to cooperate as a team, and compete with another team, 
+        there needs to be a different algo. he Unity MLAgents team developed the solution in a new multi-agent trainer 
+        called MA-POCA (Multi-Agent POsthumous Credit Assignment)
+        - The idea is simple but powerful: a centralized critic processes the states of all agents in the 
+        team to estimate how well each agent is doing. Think of this critic as a coach.
+    - Unit-8: Proximal Policy Optimisation:
+        - Proximal Policy Optimization (PPO), an architecture that improves our agent’s training stability by 
+        avoiding policy updates that are too large. To do that, we use a ratio that indicates the 
+        difference between our current and old policy and clip this ratio to a specific range
+        [1−ϵ,1+ϵ] . 
+        For two reasons:
+            * We know empirically that smaller policy updates during training are more likely to converge 
+            to an optimal solution.
+            * A too-big step in a policy update can result in falling “off the cliff” (getting a 
+            bad policy) and taking a long time or even having no possibility to recover.
+        - The idea is to constrain our policy update with a new objective function called the 
+        Clipped surrogate objective function that will constrain the policy change in a small range 
+        using a clip.
+        By clipping the ratio, we ensure that we do not have a too large policy update because the current policy can’t be too different from the older one.
+        To do that, we have two solutions:
+            - TRPO (Trust Region Policy Optimization) uses KL divergence constraints outside the objective function to constrain the policy update. But this method is complicated to implement and takes more computation time.
+            - PPO clip probability ratio directly in the objective function with its Clipped surrogate objective function.
+    - Additional: Model Based RL 
+        - There is an agent that repeatedly tries to solve a problem, accumulating state and action data.
+        - With that data, the agent creates a structured learning tool, a dynamics model, to reason about the world.
+        - With the dynamics model, the agent decides how to act by predicting the future.
+        - With those actions, the agent collects more data, improves said model, and hopefully improves future actions.
+    - Offline RL: https://www.youtube.com/watch?v=k08N5a0gG0A 
+    - RLHF: Reinforcement learning from human feedback (RLHF) is a methodology for integrating human data labels into a RL-based optimization 
+    process. It is motivated by the challenge of modeling human preferences.
+        - Read 1: https://huggingface.co/blog/rlhf
+        - watch 2: https://youtu.be/2MBJOuVq380
+    - Intro to Decision Transformers : https://huggingface.co/blog/decision-transformers
