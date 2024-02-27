@@ -62,13 +62,15 @@
             - !sudo apt-get install -y python3-opengl
             - !apt install ffmpeg
             - !apt install xvfb
+            (sudo apt install swig cmake python3-opengl ffmpeg xvfb -y)
         Pip Level:
             - pyvirtualdisplay(https://github.com/ponty/pyvirtualdisplay/tree/3.0)
             - stable-baselines3==2.0.0a5
             - swig
             - gymnasium[all] (think if entire gym is better to install)
             - huggingface_sb3
-
+            (pip install pyvirtualdisplay Stable-baselines3 swig gymnasium[all] huggingface_sb3)
+            ( pip install transformers datasets huggingface_hub evaluate accelerate bitsandbytes)
     > DeepQLearning : Value Based methods
         - value function maps state to the expected value of being at the state. 
         - policy is not trained, we need to train the value function(neural net). this value function 
